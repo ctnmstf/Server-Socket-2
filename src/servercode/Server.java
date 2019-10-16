@@ -5,8 +5,8 @@ import java.net.*;
 
 public class Server {
  
-  public final static int SOCKET_PORT = 300;  
-  public final static String FILE_TO_SEND = "C:\\Users\\musta\\Desktop\\Gönderen\\Deneme.txt";  
+  public final static int socket_port = 300;  // Port
+  public final static String file_to_send = "C:\\Users\\musta\\Desktop\\Gönderen\\Deneme.txt";  //Dosyanın konumu
  
   public static void main (String [] args ) throws IOException {
     FileInputStream fis = null;
@@ -15,20 +15,20 @@ public class Server {
     ServerSocket servsock = null;
     Socket sock = null;
     try {
-      servsock = new ServerSocket(SOCKET_PORT);
+      servsock = new ServerSocket(socket_port);
       while (true) {
         System.out.println("Bekleniyor ...");
         try {
           sock = servsock.accept();
           System.out.println("Kabul edilen bağlantı:" + sock);
-          // send file
-          File myFile = new File (FILE_TO_SEND);
+          
+          File myFile = new File (file_to_send);
           byte [] mybytearray  = new byte [(int)myFile.length()];
           fis = new FileInputStream(myFile);
           bis = new BufferedInputStream(fis);
           bis.read(mybytearray,0,mybytearray.length);
           os = sock.getOutputStream();
-          System.out.println("Gönderiliyor " + FILE_TO_SEND + "(" + mybytearray.length + " bytes)");
+          System.out.println("Gönderiliyor " + file_to_send + "(" + mybytearray.length + " bytes)");
           os.write(mybytearray,0,mybytearray.length);
           os.flush();
           System.out.println("Done.");
