@@ -1,49 +1,57 @@
 package servercode;
 
-import java.io.*;
-import java.net.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class Server {
- 
-  public final static int socket_port = 300;  // Port
-  public final static String file_to_send = "C:\\Users\\musta\\Desktop\\Gönderen\\Deneme.txt";  //Dosyanın konumu
- 
-  public static void main (String [] args ) throws IOException {
-    FileInputStream fis = null;
-    BufferedInputStream bis = null;
-    OutputStream os = null;
-    ServerSocket servsock = null;
-    Socket sock = null;
-    try {
-      servsock = new ServerSocket(socket_port);
-      while (true) {
-        System.out.println("Bekleniyor ...");
+    public static void main(String[] args) throws IOException {
+        ServerSocket serverSocket = null;
+
         try {
-          sock = servsock.accept();
-          System.out.println("Kabul edilen bağlantı:" + sock);
-          
-          File myFile = new File (file_to_send);
-          byte [] mybytearray  = new byte [(int)myFile.length()];
-          fis = new FileInputStream(myFile);
-          bis = new BufferedInputStream(fis);
-          bis.read(mybytearray,0,mybytearray.length);
-          os = sock.getOutputStream();
-          System.out.println("Gönderiliyor " + file_to_send + "(" + mybytearray.length + " bytes)");
-          os.write(mybytearray,0,mybytearray.length);
-          os.flush();
-          System.out.println("Done.");
+            serverSocket = new ServerSocket(300);
+        } catch (IOException ex) {
+            System.out.println("Hatalı port numarası! ");
         }
-        finally {
-          if (bis != null) bis.close();
-          if (os != null) os.close();
-          if (sock!=null) sock.close();
+
+        Socket socket = null;
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            socket = serverSocket.accept();
+        } catch (IOException ex) {
+            System.out.println("Client bağlantısı kabul edilmiyor! ");
         }
-      }
+
+        try {
+            in = socket.getInputStream();
+        } catch (IOException ex) {
+            System.out.println("Socket girişi sağlanamıyor! ");
+        }
+
+        try {
+            out = new FileOutputStream("C:\\Users\\musta\\Desktop\\Gönderen");
+        } catch (FileNotFoundException ex) {
+            System.out.println("Dosya bulunamadı!");
+        }
+
+        byte[] bytes = new byte[1024];
+
+        int count;
+        while ((count = in.read(bytes)) > 0) {
+            out.write(bytes, 0, count);
+        }
+
+        out.close();
+        in.close();
+        socket.close();
+        serverSocket.close();
     }
-    finally {
-      if (servsock != null) servsock.close();
-    }
-  }
 }
 
 
